@@ -1,2 +1,2 @@
 for i in range(20):
-    print('evhweohvoew')
+    print('2020')
