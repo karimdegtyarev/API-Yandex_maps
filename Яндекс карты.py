@@ -30,13 +30,15 @@ screen.blit(pygame.image.load(map_file), (0, 0))
 # Переключаем экран и ждем закрытия окна.
 pygame.display.flip()
 
+move_1 = ''
 
-def moving(step, scale):
+
+def moving(shirota, dolgota, scale):
     global w
     global l
     global spn
-    w += step
-    l += step
+    w += shirota
+    l += dolgota
     spn += scale
     map_request = f"http://static-maps.yandex.ru/1.x/?ll={w},{l}&spn={spn},{spn}&l=sat"
     response = requests.get(map_request)
@@ -60,7 +62,6 @@ def moving(step, scale):
     pygame.display.flip()
 
 
-move_1 = ''
 running = True
 while running:
     for event in pygame.event.get():
@@ -73,39 +74,39 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 move_1 = "Right"
 
-            elif event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_UP:
                 move_1 = "Up"
 
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_DOWN:
                 move_1 = "Down"
 
-            elif event.key == 280:
+            elif event.key == 1073741921:
                 move_1 = "Closely"
 
-            elif event.key == 281:
+            elif event.key == 1073741915:
                 move_1 = "Far"
 
             else:
                 move_1 = 'Stop'
 
-    if move_1 != 'Stop':
-        if move_1 == "Right":
-            moving(3, 0)
+        if move_1 != 'Stop':
+            if move_1 == "Right":
+                moving(3, 0, 0)
 
-        elif move_1 == "Left":
-            moving(-3, 0)
+            elif move_1 == "Left":
+                moving(-3, 0, 0)
 
-        elif move_1 == "Up":
-            moving(-3, 0)
+            elif move_1 == "Up":
+                moving(0, -3, 0)
 
-        elif move_1 == "Down":
-            moving(3, 0)
+            elif move_1 == "Down":
+                moving(0, 3, 0)
 
-        elif move_1 == "Closely":
-            moving(0, -0.001)
+            elif move_1 == "Closely":
+                moving(0, 0, -0.0001)
 
-        elif move_1 == "Far":
-            moving(0, 0.001)
+            elif move_1 == "Far":
+                moving(0, 0, 0.0001)
 
 pygame.quit()
 os.remove(map_file)
