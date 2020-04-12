@@ -9,6 +9,7 @@ map_request = "http://static-maps.yandex.ru/1.x/?ll=-2.146939,51.263611&spn=0.00
 spn = 0.001
 w = -2.146939
 le = 51.263611
+map_vid = ['map', 'sat', 'sat,skl']
 response = requests.get(map_request)
 
 if not response:
@@ -24,16 +25,27 @@ with open(map_file, "wb") as file:
 
 # Инициализируем pygame
 pygame.init()
-screen = pygame.display.set_mode((600, 450))
+screen = pygame.display.set_mode((1100, 450))
+screen.fill((210, 0, 0))
 # Рисуем картинку, загружаемую из только что созданного файла.
 screen.blit(pygame.image.load(map_file), (0, 0))
+f1 = pygame.font.Font(None, 36)
+text1 = f1.render('Сейчас используется: sat', 1, (255, 255, 255))
+text2 = f1.render('Изменить на:', 1, (255, 255, 255))
+text3 = f1.render('map', 1, (255, 255, 255))
+text4 = f1.render('sat,skl', 1, (255, 255, 255))
+screen.blit(text1, (700, 50))
+screen.blit(text2, (700, 100))
+screen.blit(text3, (750, 130))
+screen.blit(text4, (850, 130))
 # Переключаем экран и ждем закрытия окна.
 pygame.display.flip()
 
 move_1 = ''
 
 
-def moving(shirota, dolgota, scale):
+def changes(shirota, dolgota, scale, vid='sat'):
+    global f1
     global w
     global le
     global spn
@@ -41,7 +53,7 @@ def moving(shirota, dolgota, scale):
     le += dolgota
     if 0.001 <= spn * scale <= 90 and w < 180 and le < 90:
         spn *= scale
-        new_map_request = f"http://static-maps.yandex.ru/1.x/?ll={w},{le}&spn={spn},{spn}&l=sat"
+        new_map_request = f"http://static-maps.yandex.ru/1.x/?ll={w},{le}&spn={spn},{spn}&l={vid}"
         print(new_map_request)
         new_response = requests.get(new_map_request)
 
@@ -57,9 +69,20 @@ def moving(shirota, dolgota, scale):
             new_file.write(new_response.content)
 
         # Инициализируем pygame
-        new_screen = pygame.display.set_mode((600, 450))
+        new_screen = pygame.display.set_mode((1100, 450))
+        new_screen.fill((210, 0, 0))
         # Рисуем картинку, загружаемую из только что созданного файла.
         new_screen.blit(pygame.image.load(new_map_file), (0, 0))
+        f1 = pygame.font.Font(None, 36)
+        new_text1 = f1.render(f'Сейчас используется: {vid}', 1, (255, 255, 255))
+        new_text2 = f1.render('Изменить на:', 1, (255, 255, 255))
+        new_text3 = f1.render('map', 1, (255, 255, 255))
+        new_text4 = f1.render('sat,skl', 1, (255, 255, 255))
+        screen.blit(new_text1, (700, 50))
+        screen.blit(new_text2, (700, 100))
+        screen.blit(new_text3, (750, 130))
+        screen.blit(new_text4, (850, 130))
+        new_screen.blit(new_text1, (700, 50))
         # Переключаем экран и ждем закрытия окна.
         pygame.display.flip()
 
@@ -69,6 +92,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        pos = pygame.mouse.get_pos
+        if pos == (20, 20):
+            pass
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 move_1 = "Left"
@@ -90,22 +116,22 @@ while running:
 
             if move_1 != 'Stop':
                 if move_1 == "Right":
-                    moving(3, 0, 1)
+                    changes(3, 0, 1)
 
                 elif move_1 == "Left":
-                    moving(-3, 0, 1)
+                    changes(-3, 0, 1)
 
                 elif move_1 == "Up":
-                    moving(0, 3, 1)
+                    changes(0, 3, 1)
 
                 elif move_1 == "Down":
-                    moving(0, -3, 1)
+                    changes(0, -3, 1)
 
                 elif move_1 == "Closely":
-                    moving(0, 0, 0.5)
+                    changes(0, 0, 0.5)
 
                 elif move_1 == "Far":
-                    moving(0, 0, 2)
+                    changes(0, 0, 2)
 
 pygame.quit()
 os.remove(map_file)
