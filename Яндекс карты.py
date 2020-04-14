@@ -9,7 +9,9 @@ map_request = "http://static-maps.yandex.ru/1.x/?ll=-2.146939,51.263611&spn=0.00
 spn = 0.001
 w = -2.146939
 le = 51.263611
-map_vid = ['map', 'sat', 'sat,skl']
+map_vid = ['sat', 'map', 'sat,skl']
+for_change = ['map', 'sat,skl']
+vid = 'sat'
 response = requests.get(map_request)
 
 if not response:
@@ -44,16 +46,19 @@ pygame.display.flip()
 move_1 = ''
 
 
-def changes(shirota, dolgota, scale, vid='sat'):
+def changes(shirota, dolgota, scale, view):
     global f1
+    global vid
     global w
     global le
     global spn
+    global for_change
+    vid = view
     w += shirota
     le += dolgota
     if 0.001 <= spn * scale <= 90 and w < 180 and le < 90:
         spn *= scale
-        new_map_request = f"http://static-maps.yandex.ru/1.x/?ll={w},{le}&spn={spn},{spn}&l={vid}"
+        new_map_request = f"http://static-maps.yandex.ru/1.x/?ll={w},{le}&spn={spn},{spn}&l={view}"
         print(new_map_request)
         new_response = requests.get(new_map_request)
 
@@ -74,10 +79,16 @@ def changes(shirota, dolgota, scale, vid='sat'):
         # Рисуем картинку, загружаемую из только что созданного файла.
         new_screen.blit(pygame.image.load(new_map_file), (0, 0))
         f1 = pygame.font.Font(None, 36)
-        new_text1 = f1.render(f'Сейчас используется: {vid}', 1, (255, 255, 255))
+        new_text1 = f1.render(f'Сейчас используется: {view}', 1, (255, 255, 255))
         new_text2 = f1.render('Изменить на:', 1, (255, 255, 255))
-        new_text3 = f1.render('map', 1, (255, 255, 255))
-        new_text4 = f1.render('sat,skl', 1, (255, 255, 255))
+        if view == 'map':
+            for_change = ['sat', 'sat,skl']
+        elif view == 'sat':
+            for_change = ['map', 'sat,skl']
+        else:
+            for_change = ['sat', 'map']
+        new_text3 = f1.render(for_change[0], 1, (255, 255, 255))
+        new_text4 = f1.render(for_change[1], 1, (255, 255, 255))
         screen.blit(new_text1, (700, 50))
         screen.blit(new_text2, (700, 100))
         screen.blit(new_text3, (750, 130))
@@ -92,9 +103,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        pos = pygame.mouse.get_pos
-        if pos == (20, 20):
-            pass
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if 750 <= event.pos[0] <= 750 + 20 * len(for_change[0]) and 130 <= event.pos[1] <= 155:
+                changes(0, 0, 1, for_change[0])
+            elif 850 <= event.pos[0] <= 850 + 20 * len(for_change[1]) and 130 <= event.pos[1] <= 155:
+                changes(0, 0, 1, for_change[1])
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 move_1 = "Left"
@@ -116,22 +129,22 @@ while running:
 
             if move_1 != 'Stop':
                 if move_1 == "Right":
-                    changes(3, 0, 1)
+                    changes(3, 0, 1, vid)
 
                 elif move_1 == "Left":
-                    changes(-3, 0, 1)
+                    changes(-3, 0, 1, vid)
 
                 elif move_1 == "Up":
-                    changes(0, 3, 1)
+                    changes(0, 3, 1, vid)
 
                 elif move_1 == "Down":
-                    changes(0, -3, 1)
+                    changes(0, -3, 1, vid)
 
                 elif move_1 == "Closely":
-                    changes(0, 0, 0.5)
+                    changes(0, 0, 0.5, vid)
 
                 elif move_1 == "Far":
-                    changes(0, 0, 2)
+                    changes(0, 0, 2, vid)
 
 pygame.quit()
 os.remove(map_file)
