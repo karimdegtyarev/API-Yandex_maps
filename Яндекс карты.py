@@ -224,7 +224,6 @@ while running:
                 move_1 = "Far"
             if active1:
                 if event.key == pygame.K_RETURN:
-                    print(find1)
                     find1 = ''
                 elif event.key == pygame.K_BACKSPACE:
                     find1 = find1[:-1]
