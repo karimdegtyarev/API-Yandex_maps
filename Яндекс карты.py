@@ -65,7 +65,12 @@ move_1 = ''
 def finding(shirota, dolgota):
     global screen
     global vid
+    global w
+    global le
     global last_spn
+    w = float(shirota)
+    le = float(dolgota)
+    print(w, le, last_spn)
     new_map_request = f"http://static-maps.yandex.ru/1.x/?ll={shirota}" \
         f",{dolgota}&spn={last_spn},{last_spn}&l={vid}"
     new_response = requests.get(new_map_request)
@@ -88,6 +93,7 @@ def finding(shirota, dolgota):
     f1 = pygame.font.Font(None, 36)
     pygame.draw.rect(screen, (255, 255, 255), (720, 230, 100, 30), 2)
     pygame.draw.rect(screen, (255, 255, 255), (850, 230, 100, 30), 2)
+    pygame.draw.circle(screen, (255, 0, 0), (300, 225), 10)
     new_text1 = f1.render(f'Сейчас используется: {vid}', 1, (255, 255, 255))
     new_text2 = f1.render('Изменить на:', 1, (255, 255, 255))
     new_text3 = f1.render(for_change[0], 1, (255, 255, 255))
@@ -122,7 +128,8 @@ def changes(shirota, dolgota, scale, view):
     global for_change
     global last_spn
     vid = view
-    last_spn = scale
+    last_spn = spn
+    print(w, le, spn)
     w += shirota
     le += dolgota
     if 0.001 <= spn * scale <= 90 and w < 180 and le < 90:
@@ -222,6 +229,8 @@ while running:
 
             elif event.key == pygame.K_PAGEDOWN:
                 move_1 = "Far"
+            else:
+                move_1 = "Stop"
             if active1:
                 if event.key == pygame.K_RETURN:
                     find1 = ''
@@ -242,16 +251,16 @@ while running:
 
             if move_1 != 'Stop':
                 if move_1 == "Right":
-                    changes(3, 0, 1, vid)
+                    changes(spn/2, 0, 1, vid)
 
                 elif move_1 == "Left":
-                    changes(-3, 0, 1, vid)
+                    changes(-spn/2, 0, 1, vid)
 
                 elif move_1 == "Up":
-                    changes(0, 3, 1, vid)
+                    changes(0, spn/2, 1, vid)
 
                 elif move_1 == "Down":
-                    changes(0, -3, 1, vid)
+                    changes(0, -spn/2, 1, vid)
 
                 elif move_1 == "Closely":
                     changes(0, 0, 0.5, vid)
