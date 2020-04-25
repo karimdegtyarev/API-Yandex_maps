@@ -16,6 +16,7 @@ find1 = ''
 find2 = ''
 active1 = False
 active2 = False
+finded = False
 response = requests.get(map_request)
 
 if not response:
@@ -63,6 +64,7 @@ move_1 = ''
 
 
 def finding(shirota, dolgota):
+    global finded
     global screen
     global vid
     global w
@@ -80,7 +82,7 @@ def finding(shirota, dolgota):
         print(new_map_request)
         print("Http статус:", new_response.status_code, "(", new_response.reason, ")")
         sys.exit(1)
-
+    finded = True
     new_map_file = "map.png"
     with open(new_map_file, "wb") as new_file:
         new_file.write(new_response.content)
@@ -127,6 +129,7 @@ def changes(shirota, dolgota, scale, view):
     global spn
     global for_change
     global last_spn
+    global finded
     vid = view
     last_spn = spn
     print(w, le, spn)
@@ -156,6 +159,17 @@ def changes(shirota, dolgota, scale, view):
         f1 = pygame.font.Font(None, 36)
         pygame.draw.rect(screen, (255, 255, 255), (720, 230, 100, 30), 2)
         pygame.draw.rect(screen, (255, 255, 255), (850, 230, 100, 30), 2)
+        #       if finded:
+        #          if shirota == dolgota != 0:
+        #               shf = 1
+        #              df = 1
+        #              if shirota < 0:
+        #                  shf *= -1
+        #              pygame.draw.circle(screen, (255, 0, 0), (300 - 40, 225 - (dolgota * 20000)), 10)
+        #              shf = 1
+        #              df = 1
+        #          elif not dolgota:
+
         new_text1 = f1.render(f'Сейчас используется: {view}', 1, (255, 255, 255))
         new_text2 = f1.render('Изменить на:', 1, (255, 255, 255))
         if view == 'map':
@@ -251,16 +265,16 @@ while running:
 
             if move_1 != 'Stop':
                 if move_1 == "Right":
-                    changes(spn/2, 0, 1, vid)
+                    changes(spn / 2, 0, 1, vid)
 
                 elif move_1 == "Left":
-                    changes(-spn/2, 0, 1, vid)
+                    changes(-spn / 2, 0, 1, vid)
 
                 elif move_1 == "Up":
-                    changes(0, spn/2, 1, vid)
+                    changes(0, spn / 2, 1, vid)
 
                 elif move_1 == "Down":
-                    changes(0, -spn/2, 1, vid)
+                    changes(0, -spn / 2, 1, vid)
 
                 elif move_1 == "Closely":
                     changes(0, 0, 0.5, vid)
